@@ -10,6 +10,8 @@ import FatalError from "./shared/components/FatalError";
 import ValidationErrors from "./shared/components/ValidationErrors";
 import Success from "./shared/components/Success";
 import storeDefenition from "./store";
+import Axios from "axios";
+import { error } from "jquery";
 
 window.Vue = require("vue");
 
@@ -27,6 +29,18 @@ Vue.component("v-errors", ValidationErrors);
 
 const store = new Vuex.Store(storeDefenition);
 
+window.axios.interceptors.response.use(
+    response => {
+        return response;
+    },
+    error => {
+        if (401 == error.response.status) {
+            store.dispatch('logout');
+        }
+        return Promise.reject(error);
+    }
+);
+
 const app = new Vue({
     el: "#app",
     router,
@@ -34,7 +48,8 @@ const app = new Vue({
     components: {
         index: Index
     },
-    beforeCreate() {
+    async beforeCreate() {
         this.$store.dispatch("loadStoredState");
+        this.$store.dispatch('loadUser');
     }
 });

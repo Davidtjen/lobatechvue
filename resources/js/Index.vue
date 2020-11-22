@@ -40,6 +40,34 @@
             </li> -->
           </ul>
           <span>
+            <a
+              v-if="isLoggedIn"
+              class="nav-link text-white ml-0 mr-2"
+              href="#"
+              @click.prevent="logout"
+            >
+              Logout
+            </a>
+          </span>
+          <span>
+            <router-link
+              v-if="!isLoggedIn"
+              class="nav-link text-white ml-0 mr-2"
+              :to="{ name: 'login' }"
+            >
+              Sign-in
+            </router-link>
+          </span>
+          <span>
+            <router-link
+              v-if="!isLoggedIn"
+              class="nav-link text-white ml-0 mr-2"
+              :to="{ name: 'register' }"
+            >
+              Register
+            </router-link>
+          </span>
+          <span>
             <router-link
               class="nav-link text-white ml-0 mr-2"
               :to="{ name: 'basket' }"
@@ -64,6 +92,7 @@
 <!-- Javascript -->
 <script>
 import { mapGetters, mapState } from "vuex";
+import { isLoggedIn } from "./shared/utils/auth";
 
 export default {
   data() {
@@ -73,13 +102,24 @@ export default {
   },
   computed: {
     ...mapState({
-      lastSearchComputed: " lastSearch",
+      lastSearchComputed: "lastSearch",
+      isLoggedIn: "isLoggedIn",
     }),
     ...mapGetters({
       itemsInBasket: "itemsInBasket",
     }),
     somethingElse() {
       return 1 + 3;
+    },
+  },
+  methods: {
+    async logout() {
+      try {
+        await axios.post("/logout");
+        this.$store.dispatch("logout");
+      } catch (error) {
+        this.$store.dispatch("logout");
+      }
     },
   },
 };
